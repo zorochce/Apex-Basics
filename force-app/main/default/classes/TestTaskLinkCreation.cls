@@ -5,11 +5,7 @@
 public with sharing class TestTaskLinkCreation {
     @IsTest
     static void testCreateTaskAndLink() {
-        List<Account> newAccounts = new List<Account>();
-        for (Integer i = 0; i < 10; i++) {
-            newAccounts.add(new Account(Name = 'Test Task Account ' + i));
-        }
-        insert newAccounts;
+        List<Account> newAccounts = TestMyDataFactory.createAccounts(10,'testCreateTaskAndLink');
 
         List<TaskLinkCreation.DataWrapper> accountsIds = new List<TaskLinkCreation.DataWrapper>();
         for (Account acc : newAccounts) {

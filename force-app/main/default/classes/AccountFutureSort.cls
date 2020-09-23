@@ -4,9 +4,11 @@
 
 public with sharing class AccountFutureSort {
     @future
-    public static void sortMethod(){
+    public static void futureMethod(){
         List<Account> accounts = [SELECT BillingAddress, (SELECT Id FROM Contacts) FROM Account LIMIT 150];
         List<Contact> contacts = new List<Contact>();
+
+        System.debug(accounts);
 
         for(Account account:accounts){
             if(account.BillingAddress != null){

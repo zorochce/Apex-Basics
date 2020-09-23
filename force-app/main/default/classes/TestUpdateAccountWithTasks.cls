@@ -5,27 +5,12 @@
 public class TestUpdateAccountWithTasks {
     @IsTest
     static void testUpdateAccount() {
-        List<Account> newAccounts = new List<Account>();
-        List<Task> oldTasks = new List<Task>();
-
-        for (Integer i = 0; i < 3; i++) {
-            newAccounts.add(new Account(Name = 'TestUpdateAccountWithTasks ' + i));
-        }
-        insert newAccounts;
-
-        for (Integer i = 0; i < 3; i++) {
-            for (Integer j = 0; j < 3; j++) {
-                Task task = new Task(Subject = 'TestUpdateAccountWithTasks',OwnerId='0052w000005rQI3AAM',
-                        WhatId=newAccounts[i].Id);//system administrator id
-                oldTasks.add(task);
-            }
-        }
-
-        insert oldTasks;
+        List<Account> oldAccounts = TestMyDataFactory.createAccounts(5,'createAccountsWithTasks');
+        List<Task> oldTasks = TestMyDataFactory.createTasksRelatedToAccounts(oldAccounts,3,'createAccountsWithTasks');
         System.debug('old tasks : ' + oldTasks);
 
         List<UpdateAccountWithTasks.DataWrapper> accountsIds = new List<UpdateAccountWithTasks.DataWrapper>();
-        for (Account acc : newAccounts) {
+        for (Account acc : oldAccounts) {
             UpdateAccountWithTasks.DataWrapper dw = new UpdateAccountWithTasks.DataWrapper();
             dw.accountId = acc.Id;
             accountsIds.add(dw);
@@ -35,8 +20,8 @@ public class TestUpdateAccountWithTasks {
         UpdateAccountWithTasks.updateAccount(accountsIds);
         Test.stopTest();
 
-        List<Task> updatedTasks = [SELECT AccountId,OwnerId,WhatId FROM Task WHERE Subject = 'TestUpdateAccountWithTasks'];
-        System.debug('updated tasks : ' +updatedTasks);
+        List<Task> updatedTasks = [SELECT AccountId,OwnerId,WhatId FROM Task WHERE Subject = 'createAccountsWithTasks'];
+        System.debug('updated tasks : ' + updatedTasks);
         for (Task updatedTask : updatedTasks) {
             for (Task oldTask : oldTasks) {
                 if (updatedTask.OwnerId == oldTask.OwnerId && updatedTask.Id == oldTask.Id) {
