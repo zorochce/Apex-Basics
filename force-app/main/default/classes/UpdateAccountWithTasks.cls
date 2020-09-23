@@ -7,8 +7,9 @@ global class UpdateAccountWithTasks {
     public static void updateAccount(List<DataWrapper> incomingData) {
         List<Task> taskToUpdate = new List<Task>();
         List<Task> taskToInsert = new List<Task>();
-        List<Task> allTasks = [SELECT Subject,AccountId FROM Task];
+        List<Task> allTasks = [SELECT Subject,AccountId,OwnerId FROM Task];
         List<User> users = [SELECT Name FROM User WHERE IsActive = TRUE];
+        System.debug('users : ' + users);
 
         for (DataWrapper dw : incomingData) {
             List<Task> tasks = new List<Task>();
@@ -17,21 +18,24 @@ global class UpdateAccountWithTasks {
                     tasks.add(task);
                 }
             }
-            if (tasks.size() > 3) {
+            if (tasks.size() >= 3) {
                 Integer randomUserNumber = (Integer) Math.random() * users.size();
                 for (Task task : tasks) {
+                    while(users[randomUserNumber].Id == task.OwnerId){
+                        randomUserNumber = (Integer) Math.random() * users.size();
+                    }
                     task.OwnerId = users[randomUserNumber].Id;
                     task.Description = 'was updated';
                 }
                 taskToUpdate.addAll(tasks);
             } else {
                 Task newTask = new Task(Subject = 'Negotiation number ' + tasks.size(), WhatId = dw.accountId);
-                taskToInsert.addAll(tasks);
+                taskToInsert.add(newTask);
             }
         }
 
-        update taskToUpdate;
         insert taskToInsert;
+        update taskToUpdate;
     }
 
     global class DataWrapper {
